@@ -1,4 +1,4 @@
-#From alecjacobson/FLUFFY
+#Adapted from alecjacobson/FLUFFY
 #
 # Try to find NANOGUI library and include path.
 # Once done this will define
@@ -10,58 +10,27 @@
 
 if(NOT NANOGUI_FOUND)
 
-FIND_PATH(NANOGUI_INCLUDE_DIR nanogui/nanogui.h
-  PATHS
-    ${PROJECT_SOURCE_DIR}/../../external/nanogui/include
-    ${PROJECT_SOURCE_DIR}/../external/nanogui/include
-    ${PROJECT_SOURCE_DIR}/external/nanogui/include
-    ${PROJECT_SOURCE_DIR}/../../libigl/external/nanogui/include
-    ${PROJECT_SOURCE_DIR}/../libigl/external/nanogui/include
-    ${PROJECT_SOURCE_DIR}/libigl/external/nanogui/include
-    /usr/local/include
-    /usr/X11/include
-    /usr/include
-    /opt/local/include
-    NO_DEFAULT_PATH
-    )
+FIND_PATH(NANOGUI_INCLUDE_DIR nanogui/nanogui.h)
 
-FIND_LIBRARY( NANOGUI_LIBRARY NAMES nanogui
-  PATHS
-    ${PROJECT_SOURCE_DIR}/../../external/nanogui/build
-    ${PROJECT_SOURCE_DIR}/../external/nanogui/build
-    ${PROJECT_SOURCE_DIR}/external/nanogui/build
-    ${PROJECT_SOURCE_DIR}/../../libigl/external/nanogui/build
-    ${PROJECT_SOURCE_DIR}/../libigl/external/nanogui/build
-    ${PROJECT_SOURCE_DIR}/libigl/external/nanogui/build
-    ${PROJECT_SOURCE_DIR}/../../external/glfw/lib/x64
-    ${PROJECT_SOURCE_DIR}/../external/glfw/lib/x64
-    ${PROJECT_SOURCE_DIR}/external/glfw/lib/x64
-    ${PROJECT_SOURCE_DIR}/../../libigl/external/glfw/lib/x64
-    ${PROJECT_SOURCE_DIR}/../libigl/external/glfw/lib/x64
-    ${PROJECT_SOURCE_DIR}/libigl/external/glfw/lib/x64
-    /usr/local
-    /usr/X11
-    /usr
-    PATH_SUFFIXES
-    a
-    lib64
-    lib
-    NO_DEFAULT_PATH
-)
+FIND_LIBRARY( NANOGUI_LIBRARY_RELEASE NAMES nanogui)
+FIND_LIBRARY( NANOGUI_LIBRARY_DEBUG NAMES nanoguid)
 
 SET(NANOGUI_FOUND "NO")
-IF (NANOGUI_INCLUDE_DIR AND NANOGUI_LIBRARY)
+IF (NANOGUI_INCLUDE_DIR AND NANOGUI_LIBRARY_RELEASE)
+	 add_library(NanoGUI::NanoGUI STATIC IMPORTED)
+	 set_property(TARGET NanoGUI::NanoGUI PROPERTY IMPORTED_LOCATION_RELEASE ${NANOGUI_LIBRARY_RELEASE})
+	 if(NANOGUI_LIBRARY_DEBUG)
+		set_property(TARGET NanoGUI::NanoGUI PROPERTY IMPORTED_LOCATION_DEBUG   ${NANOGUI_LIBRARY_DEBUG})
+	 endif()
+
 	SET(NANOGUI_FOUND "YES")
   SET(NANOGUI_INCLUDE_DIRS
-         ${NANOGUI_INCLUDE_DIR}
-         ${NANOGUI_INCLUDE_DIR}/../ext/nanovg/src
-         ${NANOGUI_INCLUDE_DIR}/../ext/glfw/include
+         "${NANOGUI_INCLUDE_DIR}" "${NANOGUI_INCLUDE_DIR}/eigen3" "${NANOGUI_INCLUDE_DIR}/nanovg" CACHE STRING "" FORCE
          )
-
-ENDIF (NANOGUI_INCLUDE_DIR AND NANOGUI_LIBRARY)
+ENDIF (NANOGUI_INCLUDE_DIR AND NANOGUI_LIBRARY_RELEASE)
 
 if(NANOGUI_FOUND)
-  message(STATUS "Found NANOGUI: ${NANOGUI_INCLUDE_DIR}")
+  message(STATUS "Found NANOGUI: ${NANOGUI_INCLUDE_DIR} ${NANOGUI_LIBRARY_RELEASE}")
 else(NANOGUI_FOUND)
   if (NOT NANOGUI_FIND_QUIETLY)
     message(FATAL_ERROR "could NOT find NANOGUI")
