@@ -1,0 +1,1 @@
+CGET_HAS_DEPENDENCY(NanoGUI GITHUB wjakob/nanogui VERSION master)
